@@ -1,0 +1,445 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="keywords" content="Tourism, Travel Information, Geolocation, Country Information, Gazetteer">
+    <meta name="description" content="A Web Application that will provide information for a chosen country for travel purposes">
+    <meta name="author" content="Peter Madziyire">
+    <title>gazetteer</title>
+
+    <!--Favicon-->
+    <link rel="icon" href="./libs/src/images/travel.png" type="image/x-icon">
+
+    <!-- Leaflet CSS -->
+    <link rel="stylesheet" href="./libs/src/leaftet/leaflet.css" />
+
+     <!-- Leaflet CSS -->
+     <link rel="stylesheet" href="./libs/src/leaftet/easy-button-css.css" />
+
+    <!--Bootstap CSS-->
+    <link rel="stylesheet" href="./libs/src/bootstrap/css/bootstrap.min.css"/>
+
+     <!-- Main CSS -->
+     <link rel="stylesheet" href="libs/css/styles.css" />
+    </head>
+   
+   
+
+  
+
+</head>
+<body>
+
+
+    <nav class="navbar  navOpacity d-flex justify-content-between">
+      <a class="navbar-brand "  href="">
+        Gazetteer
+      </a>
+      <!-- Select -->
+      <select name="selectCountry" id="selectCountry">
+        <option value="choose">Select a Country</option>
+      </select>
+    </nav>
+
+    <!--Info Modals-->
+    <div
+    class="modal fade"
+    id="countryInfo"
+    tabindex="-1"
+    aria-labelledby="countryInfoId"
+    aria-hidden="true"
+  > 
+<div class="modal-dialog modal-sm modal-lg">
+      <div class="modal-content">
+        <div class="modal-header justify-content-center">
+
+<table class="table table-striped">
+
+<thead>
+  <tr class="table-bg">
+    <th colspan='2' scope="col">Information</th>
+
+  </tr>
+</thead>
+<tbody>
+  
+  <tr>
+   
+    <td class="left">Country:</td>
+    <td class="right countryName"></td>
+    
+  </tr>
+
+
+  <tr>
+   
+    <td class="left">Capital:</td>
+    <td class="right capitalCity"></td>
+    
+  </tr>
+
+  <tr>
+   
+    <td class="left">Continent:</td>
+    <td class="right continentName"></td>
+    
+  </tr>
+
+  <tr>
+   
+    <td class="left">Population:</td>
+    <td class="right population"></td>
+    
+  </tr>
+
+  <tr>
+   
+    <td class="left">Area in SQ.KM:</td>
+    <td class="right areask"></td>
+    
+  </tr>
+
+  <tr>
+   
+    <td class="left">Telephone Code:</td>
+    <td class="right telCode"></td>
+    
+  </tr>
+<tr>
+   
+    <td class="left">Drinking Water:</td>
+    <td class="right water"></td>
+    
+  </tr>
+
+  
+</tbody>
+</table>
+
+</div>
+        <div class="modal-footer">
+          <button
+            type="button"
+            class="btn btn-secondary"
+            data-bs-dismiss="modal"
+          >
+            Close
+          </button>
+        </div>
+      </div>
+    </div>
+</div>
+
+   
+ <!--Weather Modals-->
+ <div
+ class="modal fade"
+ id="weatherInfo"
+ tabindex="-1"
+ aria-labelledby="weatherInfoId"
+ aria-hidden="true"
+> 
+<div class="modal-dialog modal-sm modal-lg">
+  <div class="modal-content">
+    <div class="modal-header justify-content-center">
+
+<table class="table table-striped">
+
+<thead>
+<tr class="table-bg">
+<th colspan='2' scope="col">Average Weather Temperatue</th>
+
+</tr>
+</thead>
+<tbody>
+
+  <tr>
+
+    <td class="left">Current Temperature:</td>
+    <td class="right current"></td>
+    
+    </tr>
+    
+    
+    
+
+<tr>
+
+<td class="left">January:</td>
+<td class="right jan"></td>
+
+</tr>
+
+
+<tr>
+
+<td class="left">February:</td>
+<td class="right feb"></td>
+
+</tr>
+
+<tr>
+
+<td class="left">March:</td>
+<td class="right march"></td>
+
+</tr>
+
+<tr>
+
+<td class="left">April:</td>
+<td class="right april"></td>
+
+</tr>
+
+<tr>
+
+<td class="left">May:</td>
+<td class="right may"></td>
+
+</tr>
+
+<tr>
+
+<td class="left">June:</td>
+<td class="right june"></td>
+
+</tr>
+<tr>
+
+<td class="left">July:</td>
+<td class="right july"></td>
+
+</tr>
+<tr>
+
+<td class="left">August:</td>
+<td class="right aug"></td>
+
+</tr>
+<tr>
+
+<td class="left">September:</td>
+<td class="right sept"></td>
+
+</tr>
+<tr>
+
+<td class="left">October:</td>
+<td class="right oct"></td>
+
+</tr>
+<tr>
+
+<td class="left">November:</td>
+<td class="right nov"></td>
+
+</tr>
+<tr>
+
+<td class="left">December:</td>
+<td class="right dec"></td>
+
+</tr>
+
+
+</tbody>
+</table>
+
+</div>
+    <div class="modal-footer">
+      <button
+        type="button"
+        class="btn btn-secondary"
+        data-bs-dismiss="modal"
+      >
+        Close
+      </button>
+    </div>
+  </div>
+</div>
+</div>
+
+<!--Currency Modals-->
+<div
+class="modal fade"
+id="currencyInfo"
+tabindex="-1"
+aria-labelledby="currencyInfoId"
+aria-hidden="true"
+> 
+<div class="modal-dialog modal-sm modal-lg">
+  <div class="modal-content">
+    <div class="modal-header justify-content-center">
+
+<table class="table table-striped">
+
+<thead>
+<tr class="table-bg">
+<th colspan='2' scope="col">Currency</th>
+
+</tr>
+</thead>
+<tbody>
+
+<tr>
+
+<td class="left">Currency:</td>
+<td class="right currencyName"></td>
+
+</tr>
+
+
+<tr>
+
+<td class="left">Rate to USD:</td>
+<td class="right usd"></td>
+
+</tr>
+
+<tr>
+
+<td class="left">Currency Code:</td>
+<td class="right currencyCode"></td>
+
+</tr>
+
+<tr>
+
+<td class="left">Symbol:</td>
+<td class="right symbol"></td>
+
+</tr>
+
+
+
+
+</tbody>
+</table>
+
+</div>
+    <div class="modal-footer">
+      <button
+        type="button"
+        class="btn btn-secondary"
+        data-bs-dismiss="modal"
+      >
+        Close
+      </button>
+    </div>
+  </div>
+</div>
+</div>
+
+
+
+<!--Covid Modals-->
+<div
+class="modal fade"
+id="covidInfo"
+tabindex="-1"
+aria-labelledby="currencyInfoId"
+aria-hidden="true"
+> 
+<div class="modal-dialog modal-sm modal-lg">
+  <div class="modal-content">
+    <div class="modal-header justify-content-center">
+
+<table class="table table-striped">
+
+<thead>
+<tr class="table-bg">
+<th colspan='2' scope="col">Covid Statistics</th>
+
+</tr>
+</thead>
+<tbody>
+
+<tr>
+
+<td class="left">Confirmed:</td>
+<td class="right confirmed"></td>
+
+</tr>
+
+
+<tr>
+
+<td class="left">Critical:</td>
+<td class="right critical"></td>
+
+</tr>
+
+<tr>
+
+<td class="left">Deaths:</td>
+<td class="right deaths"></td>
+
+</tr>
+
+<tr>
+
+<td class="left">Recovered:</td>
+<td class="right recovered"></td>
+
+</tr>
+
+
+
+
+</tbody>
+</table>
+
+</div>
+    <div class="modal-footer">
+      <button
+        type="button"
+        class="btn btn-secondary"
+        data-bs-dismiss="modal"
+      >
+        Close
+      </button>
+    </div>
+  </div>
+</div>
+</div>
+
+
+
+
+
+<!--Loader Div-->
+
+
+    <div class="loader_container"><div class="loader"></div></div>
+    <div id="mapid"></div>
+
+   
+  
+<!-- Leaflet JS -->
+<script src="./libs//src/leaftet/leaflet.js"></script>
+
+<!--easy button js-->
+
+<script src="./libs//src/leaftet/easy-button-js.js"></script>
+ 
+
+<!--Font Awesome-->
+<script src="https://kit.fontawesome.com/a88eab2133.js" crossorigin="anonymous"></script>
+
+   <!-- Bootstrap 5.0.0-->
+   <script src="./libs/src/bootstrap/js/bootstrap.min.js"></script>
+
+   <!-- jQuery-->
+
+ 
+   <script src="./libs//src/jqeury/jquery-3.6.0.min.js"></script>
+
+    <!-- My JS -->
+   
+    <script src="./libs/scripts/scripts.js"></script>
+
+</body>
+</html>

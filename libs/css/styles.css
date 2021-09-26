@@ -1,0 +1,165 @@
+#flag {
+  width: 95px;
+  height: 50px;
+  text-align: center;
+  box-shadow: 2px 2px 5px;
+ 
+}
+
+.navbar #selectCountry{padding:0.25rem;
+  width:auto;
+  text-align-last:center;
+  font-weight:bold;
+  border-color: #f47a8f;
+  border-radius: 0.25rem;
+}
+  @media (max-width: 545px){.navbar #selectCountry{width:10rem}}
+
+  @media (max-width: 310px){.navbar #selectCountry{ width: 8rem;
+    font-size: 0.6rem;}}
+
+#space {
+  padding: 2px;
+}
+
+
+body{
+    background-color: #d9e4f5;
+    background-image: linear-gradient(43deg, #4158D0 0%, #C850C0 46%, #FFCC70 100%);
+    
+
+
+}
+
+ 
+table {
+
+  border: solid salmon;
+}
+
+.table-bg{
+  background-color: #d9e4f5;
+  background-image: linear-gradient(43deg, #4158D0 0%, #C850C0 46%, #FFCC70 100%);
+
+}
+
+
+
+.navOpacity{
+background-color: bisque;
+
+}
+
+.navbar{
+height: 10vh;
+box-shadow: 0px 1px 10px #999;
+background-color: rgba(252, 209, 212, 0.6);
+z-index: 1020;
+padding: 0 0.5rem;
+}
+
+#mapid{
+
+height: 90vh;
+position:relative;
+z-index: 1;
+
+}
+
+.loader_container{
+height: 90vh;
+width: 100%;
+position:absolute;
+background-color: #d9e4f5;
+background-image: linear-gradient(315deg, #d9e4f5 0%, #f5e3e6 74%);
+overflow: hidden;
+z-index: 1000;
+}
+
+.loader{
+
+  height: 100px;
+  width: 100px;
+  border: 15px solid #45274b;
+  border-top-color:#C850C0;
+  position: absolute;
+  margin: auto;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  border-radius: 50%;
+  animation: spin 1.5s infinite linear;
+}
+
+  @keyframes spin{ 
+    100%{
+       transform: rotate(360deg);
+    }
+  
+
+
+}
+
+  .leaflet-popup-content-wrapper{
+    border-radius: 2px;
+ margin: 0;
+
+  }
+
+  .leaflet-popup-content {
+    margin: 1px 1px;
+    line-height: 1.4;
+}
+
+  .forecast div.leaflet-popup-content {
+    align-content: center;
+    width: auto;
+  }
+  
+  .leaflet-popup-content-wrapper .leaflet-popup-content {
+    
+    font-size: 9px;
+    width: auto;
+    border-radius: 0px;
+
+  }
+  
+  div.modal-dialog.modal-dialog-centered {
+    justify-content: center;
+  }
+
+ .navbar-brand{
+  font-family: "Palatino Linotype", "Book Antiqua", Palatino, serif;
+  color:white;
+  font-size: 16px;
+  letter-spacing: 2px;
+  word-spacing: 0px;
+  font-weight: 700;
+  text-decoration: none;
+  font-style: normal;
+  font-variant: normal;
+  text-transform: uppercase;
+}
+
+.navbar-brand:hover
+
+{
+  color:grey;
+}
+.nav-link
+
+{
+  color:grey;
+}
+
+.nav-link:hover
+
+{
+  color:white;
+}
+
+.modal-content{
+
+  font-size: 0.7rem !important;
+}
