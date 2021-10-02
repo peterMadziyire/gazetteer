@@ -211,8 +211,10 @@ curl_setopt_array($curl, [
 	CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
 	CURLOPT_CUSTOMREQUEST => "GET",
 	CURLOPT_HTTPHEADER => [
-		"x-rapidapi-host: geo-services-by-mvpc-com.p.rapidapi.com",
-		"x-rapidapi-key: c5938c321emsh089ccac416fe021p1c16c3jsnc162b790f31d"
+	
+
+        "x-rapidapi-host: geo-services-by-mvpc-com.p.rapidapi.com",
+		"x-rapidapi-key: 9921690db9msh3ce37da375bea2fp1bfc5djsnc50fcf64b7c0"
 	],
 ]);
 
@@ -225,36 +227,118 @@ $cityData = json_decode($c_response, true);
  
  
 
-//Initialize Curl
 
-$url = "http://api.aviationstack.com/v1/flights?flight_status=active&access_key=a671a76d7c4fceffa598928515d5f389&limit=100";
-    
-
-    $ch= curl_init();
-    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-    curl_setopt($ch, CURLOPT_URL, $url);
-
-    // Store the data
-    $allFlights = curl_exec($ch);
-    
-    // End the cURL
-    curl_close($ch);
-
-    // Decode JSON response
-    $flightFata = json_decode($allFlights, true);
-
-    $flightArray= [];
-
-    foreach($flightFata['data'] as $flight){
-        if($flight['live']!=null){
-        
-        array_push($flightArray, $flight);
-       
-        }
-    }
    
+// News API
+$news_url='https://newsapi.org/v2/top-headlines?country=' . $geoName['iso2'] . '&apiKey=bf0b2ace55c84a1da0b6d376cdb7ff36';
+
+$news_ch = curl_init();
+curl_setopt($news_ch, CURLOPT_SSL_VERIFYPEER, false);
+curl_setopt($news_ch, CURLOPT_RETURNTRANSFER, true);
+curl_setopt($news_ch, CURLOPT_URL, $news_url);
+
+$news_result = curl_exec($news_ch);
+
+curl_close($news_ch);
+
+$news_decode = json_decode($news_result,true);
+
+$news = null;
+if (!isset($news_decode['totalResults']) || $news_decode['status'] == "error" || $news_decode['totalResults'] == 0) {
+    $news = "N/A";
+} else {
+    $news['firstTitle'] = $news_decode['articles'][0]['title'];
+    $news['firstDescription'] = $news_decode['articles'][0]['description'];
+    $news['firstUrl'] = $news_decode['articles'][0]['url'];
+    $news['firstImageUrl'] = $news_decode['articles'][0]['urlToImage'];
+    $news['firstSource'] = $news_decode['articles'][0]['source']['name'];
+
+    $news['secondTitle'] = $news_decode['articles'][1]['title'];
+    $news['secondDescription'] = $news_decode['articles'][1]['description'];
+    $news['secondUrl'] = $news_decode['articles'][1]['url'];
+    $news['secondImageUrl'] = $news_decode['articles'][1]['urlToImage'];
+    $news['secondSource'] = $news_decode['articles'][1]['source']['name'];
+
+    $news['thirdTitle'] = $news_decode['articles'][2]['title'];
+    $news['thirdDescription'] = $news_decode['articles'][2]['description'];
+    $news['thirdUrl'] = $news_decode['articles'][2]['url'];
+    $news['thirdImageUrl'] = $news_decode['articles'][2]['urlToImage'];
+    $news['thirdSource'] = $news_decode['articles'][2]['source']['name'];
+
+    $news['fourthTitle'] = $news_decode['articles'][3]['title'];
+    $news['fourthDescription'] = $news_decode['articles'][3]['description'];
+    $news['fourthUrl'] = $news_decode['articles'][3]['url'];
+    $news['fourthImageUrl'] = $news_decode['articles'][3]['urlToImage'];
+    $news['fourthSource'] = $news_decode['articles'][3]['source']['name'];
+
+    $news['fifthTitle'] = $news_decode['articles'][4]['title'];
+    $news['fifthDescription'] = $news_decode['articles'][4]['description'];
+    $news['fifthUrl'] = $news_decode['articles'][4]['url'];
+    $news['fifthImageUrl'] = $news_decode['articles'][4]['urlToImage'];
+    $news['fifthSource'] = $news_decode['articles'][4]['source']['name'];
+}
 
 
+
+
+    // WebCams
+
+    $curl = curl_init();
+
+curl_setopt_array($curl, [
+	CURLOPT_URL => "https://webcamstravel.p.rapidapi.com/webcams/list/country=".$geoName['iso2']."?lang=en&show=webcams%3Aimage%2Clocation%2Cplayer",
+	CURLOPT_RETURNTRANSFER => true,
+	CURLOPT_FOLLOWLOCATION => true,
+	CURLOPT_ENCODING => "",
+	CURLOPT_MAXREDIRS => 10,
+	CURLOPT_TIMEOUT => 30,
+	CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+	CURLOPT_CUSTOMREQUEST => "GET",
+	CURLOPT_HTTPHEADER => [
+		"x-rapidapi-host: webcamstravel.p.rapidapi.com",
+		"x-rapidapi-key: 9921690db9msh3ce37da375bea2fp1bfc5djsnc50fcf64b7c0"
+	],
+]);
+
+$response = curl_exec($curl);
+$err = curl_error($curl);
+
+curl_close($curl);
+
+
+$camData = json_decode($response, true);
+
+
+
+// Public Holidays
+
+
+$curl = curl_init();
+
+curl_setopt_array($curl, [
+	CURLOPT_URL => "https://public-holiday.p.rapidapi.com/2021/". $geoName['iso2'],
+	CURLOPT_RETURNTRANSFER => true,
+	CURLOPT_FOLLOWLOCATION => true,
+	CURLOPT_ENCODING => "",
+	CURLOPT_MAXREDIRS => 10,
+	CURLOPT_TIMEOUT => 30,
+	CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+	CURLOPT_CUSTOMREQUEST => "GET",
+	CURLOPT_HTTPHEADER => [
+		"x-rapidapi-host: public-holiday.p.rapidapi.com",
+		"x-rapidapi-key: 9921690db9msh3ce37da375bea2fp1bfc5djsnc50fcf64b7c0"
+	],
+]);
+
+$response = curl_exec($curl);
+$err = curl_error($curl);
+
+curl_close($curl);
+
+$pubHol = json_decode($response, true);
+
+
+// output
 
      $output['status']['code'] = "200";
     $output['status']['name'] = "ok";
@@ -267,7 +351,9 @@ $url = "http://api.aviationstack.com/v1/flights?flight_status=active&access_key=
     $output['coronaStats']= $coronaCases;
     $output['travelBrief']= $travel_Brief;
     $output['cityData']= $cityData['data'];
-    $output['flightData']= $flightArray;
+    $output['webCams']= $camData;
+    $output['pubHols']= $pubHol;
+    $output['news']=$news;
     
     header('Content-Type: application/json; charset=UTF-8');
 

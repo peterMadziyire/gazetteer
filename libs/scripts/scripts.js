@@ -5,9 +5,12 @@ var border;
 var flag;
 var myMarker;
 var cityMarker;
-var flightMarker;
-var cities = L.featureGroup();
-var flights= L.featureGroup();
+var camMarker;
+var circle;
+var holDate;
+var dateFormat;
+var cams= L.markerClusterGroup();
+var cities = L.markerClusterGroup();
 var cityIcon = L.icon({
   iconUrl: "libs/src/images/courthouse.png",
   iconSize: [20, 20],
@@ -19,38 +22,86 @@ var locationIcon = L.icon({
   iconAnchor: [25, 25],
 });
 
-var flightIcon = L.icon({
-  iconUrl: "libs/src/images/airplane.png",
-  iconSize: [20, 20],
-  iconAnchor: [20, 20],
+
+var camIcon = L.AwesomeMarkers.icon(
+  {icon: 'video', 
+  prefix: 'fa', 
+  markerColor: 'orange', 
+  iconColor: 'yellow',
+  
 });
+
+var majorCityIcon = L.AwesomeMarkers.icon(
+  {icon: 'city', 
+  prefix: 'fa', 
+  markerColor: 'red', 
+  iconColor: 'white',
+  
+});
+
+
+var testDate = moment('2021-10-01');
+var time= testDate.format('dddd Do MMMM YYYY');
+
 
 //-----------------reusable functions-------------------------
  function modalData(arg){
 
+
+
+
           //Populate Modal Country Info
-          $(".countryName").html(arg.geoName.countryName);
-          $(".capitalCity").html(arg.geoName.capital);
-          $(".continentName").html(arg.geoName.continentName);
-          $(".population").html(parseFloat(arg.geoName.population).toLocaleString().replace(/\.([0-9])$/, ".$10"));
-          $(".areask").html(parseFloat(arg.geoName.areaInSqKm).toLocaleString().replace(/\.([0-9])$/, ".$10"));
-          $(".telCode").html("+" + arg.travelBrief.telephone);
-          $(".water").html(arg.travelBrief.drinkingWater);
+$(".countryName").html(arg.geoName.countryName);
+$(".capitalCity").html(arg.geoName.capital);
+$(".continentName").html(arg.geoName.continentName);
+$(".population").html(parseFloat(arg.geoName.population).toLocaleString().replace(/\.([0-9])$/, ".$10"));
+$(".areask").html(parseFloat(arg.geoName.areaInSqKm).toLocaleString().replace(/\.([0-9])$/, ".$10"));
+$(".telCode").html("+" + arg.travelBrief.telephone);
+$(".water").html(arg.travelBrief.drinkingWater);
 
           //Populate Modal Weather Info
-          $(".current").html(Number(arg.openWeatherData.feelsLike).toFixed(2) + "&deg;C")
-          $(".jan").html(Number(arg.travelBrief.weather.january).toFixed(2)  + "&deg;C");
-          $(".feb").html(Number(arg.travelBrief.weather.february).toFixed(2) + "&deg;C");
-          $(".march").html(Number(arg.travelBrief.weather.march).toFixed(2) + "&deg;C");
-          $(".april").html(Number(arg.travelBrief.weather.april).toFixed(2) + "&deg;C");
-          $(".may").html(Number(arg.travelBrief.weather.may).toFixed(2) + "&deg;C");
-          $(".june").html(Number(arg.travelBrief.weather.june).toFixed(2) + "&deg;C");
-          $(".july").html(Number(arg.travelBrief.weather.july).toFixed(2) + "&deg;C");
-          $(".aug").html(Number(arg.travelBrief.weather.august).toFixed(2) + "&deg;C");
-          $(".sept").html(Number(arg.travelBrief.weather.september).toFixed(2) + "&deg;C");
-          $(".oct").html(Number(arg.travelBrief.weather.october).toFixed(2) + "&deg;C");
-          $(".nov").html(Number(arg.travelBrief.weather.november).toFixed(2) + "&deg;C");
-          $(".dec").html(Number(arg.travelBrief.weather.december).toFixed(2) + "&deg;C");
+        
+  var yValues=[          
+  Number(arg.travelBrief.weather.january).toFixed(2),
+  Number(arg.travelBrief.weather.february).toFixed(2),
+  Number(arg.travelBrief.weather.march).toFixed(2),
+  Number(arg.travelBrief.weather.april).toFixed(2),
+  Number(arg.travelBrief.weather.may).toFixed(2),
+  Number(arg.travelBrief.weather.june).toFixed(2),
+  Number(arg.travelBrief.weather.july).toFixed(2),
+  Number(arg.travelBrief.weather.august).toFixed(2),
+  Number(arg.travelBrief.weather.september).toFixed(2),
+  Number(arg.travelBrief.weather.october).toFixed(2),
+  Number(arg.travelBrief.weather.november).toFixed(2),
+  Number(arg.travelBrief.weather.december).toFixed(2)]
+
+      
+  var xValues = ["January","February","March","April","May","June","July","August","September","October","November","December"];
+
+
+  new Chart("myChart", {
+    type: "line",
+    data: {
+      labels: xValues,
+      datasets: [{
+        fill: false,
+        lineTension: 0,
+        backgroundColor: "rgba(0,0,255,1.0)",
+        borderColor: "rgba(0,0,255,0.1)",
+        data: yValues,
+        legend: {
+          position: 'top',
+        },
+      }]
+    },
+    options: {
+      legend: {display: false},
+      title: {
+        display: true,
+        text: "Monthly Average Temperature °C"
+      }
+    }
+  });
 
           //Populate Modal Currency Info
 
@@ -65,9 +116,110 @@ var flightIcon = L.icon({
           $(".deaths").html(parseFloat(arg.coronaStats.deaths).toLocaleString().replace(/\.([0-9])$/, ".$10"));
           $(".recovered").html(parseFloat(arg.coronaStats.recovered).toLocaleString().replace(/\.([0-9])$/, ".$10"));
 
+// Populate Public Holidays
+if(arg.pubHols.length>0){
+  var row;
+
+arg.pubHols.forEach(function(hols){
+  holDate = moment(hols.date);
+  dateFormat= holDate.format('dddd, Do MMMM , YYYY');
+
+  
+
+  row+="<tr><td>"+hols.name+ "</td>" + "<td>" +dateFormat+ "</td> </tr>"
+
+
+
+}) }else{
+  
+  row="<tr><td colspan='2' scope='2'>No Data Available</td></tr>"
+  console.log("No data for this")}
+
+$("#publicHolidays").find("tBody").html(row)
+
+  // Populate latest News
+  if (arg.news=="N/A") {
+    $(".firstNewsImage").attr("src", "");
+    $(".firstNewsTitle").html(" ");
+    $(".firstNewsDescription").html(
+      "News not available for this country."
+    );
+    $(".firstNewsSource").html("N/A.");
+    $(".firstNewsUrl").attr("href", "");
+
+    $(".secondNewsImage").attr("src", "");
+    $(".secondNewsTitle").html(" ");
+    $(".secondNewsDescription").html(
+      "News not available for this country."
+    );
+    $(".secondNewsSource").html("N/A.");
+    $(".secondNewsUrl").attr("href", "");
+
+    $(".thirdNewsImage").attr("src", "");
+    $(".thirdNewsTitle").html(" ");
+    $(".thirdNewsDescription").html(
+      "News not available for this country."
+    );
+    $(".thirdNewsSource").html("N/A.");
+    $(".thirdNewsUrl").attr("href", "");
+
+    $(".fourthNewsImage").attr("src", "");
+    $(".fourthNewsTitle").html(" ");
+    $(".fourthNewsDescription").html(
+      "News not available for this country."
+    );
+    $(".fourthNewsSource").html("N/A.");
+    $(".fourthNewsUrl").attr("href", "");
+
+    $(".fifthNewsImage").attr("src", "");
+    $(".fifthNewsTitle").html(" ");
+    $(".fifthNewsDescription").html(
+      "News not available for this country."
+    );
+    $(".fifthNewsSource").html("N/A.");
+    $(".fifthNewsUrl").attr("href", "");
+  } else {
+    $(".firstNewsImage").attr("src", arg["news"]["firstImageUrl"]);
+    $(".firstNewsUrl").attr("href", arg["news"]["firstUrl"]);
+    $(".firstNewsTitle").html(arg["news"]["firstTitle"]);
+    $(".firstNewsDescription").html(arg["news"]["firstDescription"]);
+    $(".firstNewsSource").html(arg["news"]["firstSource"]);
+
+    $(".secondNewsImage").attr("src", arg["news"]["secondImageUrl"]);
+    $(".secondNewsUrl").attr("href", arg["news"]["secondUrl"]);
+    $(".secondNewsTitle").html(arg["news"]["secondTitle"]);
+    $(".secondNewsDescription").html(
+      arg["news"]["secondDescription"]
+    );
+    $(".secondNewsSource").html(arg["news"]["secondSource"]);
+
+    $(".thirdNewsImage").attr("src", arg["news"]["thirdImageUrl"]);
+    $(".thirdNewsUrl").attr("href", arg["news"]["thirdUrl"]);
+    $(".thirdNewsTitle").html(arg["news"]["thirdTitle"]);
+    $(".thirdNewsDescription").html(arg["news"]["thirdDescription"]);
+    $(".thirdNewsSource").html(arg["news"]["thirdSource"]);
+
+    $(".fourthNewsImage").attr("src", arg["news"]["fourthImageUrl"]);
+    $(".fourthNewsUrl").attr("href", arg["news"]["fourthUrl"]);
+    $(".fourthNewsTitle").html(arg["news"]["fourthTitle"]);
+    $(".fourthNewsDescription").html(
+      arg["news"]["fourthDescription"]
+    );
+    $(".fourthNewsSource").html(arg["news"]["fourthSource"]);
+
+    $(".fifthNewsImage").attr("src", arg["news"]["fifthImageUrl"]);
+    $(".fifthNewsUrl").attr("href", arg["news"]["fifthUrl"]);
+    $(".fifthNewsTitle").html(arg["news"]["fifthTitle"]);
+    $(".fifthNewsDescription").html(arg["news"]["fifthDescription"]);
+    $(".fifthNewsSource").html(arg["news"]["fifthSource"]);
+  }
+
+
+
  }
       
-      
+
+
 //Component on mount
 
 
@@ -78,9 +230,12 @@ $(window).on("load",()=>{
  
   $(".loader_container").show();
 
+  
   //Get current location
  
-navigator.geolocation.getCurrentPosition((position)=>{
+
+  const successCallback = (position) => {
+
 var latitude= position.coords.latitude;
 var longitude= position.coords.longitude;
 
@@ -100,6 +255,8 @@ latlng= new L.LatLng(latitude, longitude)
       },
       success: function (results) {
         
+
+       
         
       myMarker= L.marker([latitude, longitude]).bindPopup("<div>You are here!</div>").addTo(myMap);
 
@@ -121,61 +278,30 @@ latlng= new L.LatLng(latitude, longitude)
           },
           success: function (thisresult) {
         //if API call is successful fadeout the loader and populate modals
+        console.log(thisresult)
+
+        $("#choose").text(thisresult.geoName.countryName);
         if(thisresult.status.name=="ok"){
 
           $(".loader_container").fadeOut(2000);
           modalData(thisresult)
 
+         
+
+       
+
+
         }
+
+        
+        
 
         //create flag variable to save src link
           
           flag= `https://www.countryflags.io/${thisresult.geoName.iso2}/shiny/64.png`;
           
 
-        //format initial leaflet poppup
-            var genPopup = L.popup({className: 'gen'}).setContent(
-              "<table>" +
-                    "<tr>" +
-                        "<td colspan='2' id='space'>" + "<div class='text-center' ><img class='flags' src=" + flag + "></div></td>" + 
-                    "</tr>" +
-                    "<tr>" +
-                        "<td colspan='2' id='space' class='text-center'>" + "<b> " + thisresult.geoName.countryName +  " (" + thisresult.geoName.iso2 + ")" + " </b>" + "</td>" + 
-                    "</tr>" + 
-                   
-                    "<tr>" +
-                        "<td class='right'> Capital: </td>" + 
-                        "<td class='left'>" + thisresult.geoName.capital + "</td>" +
-                    "</tr>" + 
-    
-                    "<tr>" + 
-                        "<td class='right'> CurrentWeather: </td>"  + 
-                        "<td class='left'>" + thisresult.openWeatherData.feelsLike + " &#8451;" +
-                    "</tr>" + 
-                  
-                    "<tr>" + 
-                        "<td class='right'> TimeZone: </td>"  + 
-                        "<td class='left'> " + thisresult.travelBrief.time_zone + "</td>" +
-                    "</tr>" +
-                    "<tr>" +
-                        "<td class='right'> Currency: </td>"  + 
-                        "<td class='left'>" + thisresult.travelBrief.currency_code + " "+ thisresult.travelBrief.currency_symbol+"</td>" +
-                    "</tr>" +
-                    "<tr>" +
-                        "<td class='right'> Rate to $USD: </td>" + 
-                        "<td class='left'>" + Number(thisresult.travelBrief.rateVSdollar).toLocaleString("en") + "</td>" +
-                    "</tr>" + 
-                    "<tr>" +
-                        "<td class='right'> Drinking Water: </td>" + 
-                        "<td class='left'> +" + thisresult.travelBrief.drinkingWater + "</td>" +
-                    "</tr>" +
-                    
-                "</table>"
-
-
-            ).setLatLng(latlng);  
-
-
+       
            
           // Add country border 
 
@@ -185,12 +311,14 @@ latlng= new L.LatLng(latitude, longitude)
     
           border = L.geoJSON(thisresult["border"], {
             style: function (feature) {
-              return { color: "#C850C0" };
+              return { color: "salmon" };
             },
           }).addTo(myMap);
     
          
-          myMap.fitBounds(border.getBounds()).openPopup(genPopup);
+          myMap.fitBounds(border.getBounds())
+          
+  
 
 
       
@@ -202,9 +330,10 @@ latlng= new L.LatLng(latitude, longitude)
               if(thisresult.cityData!=null){
                 thisresult.cityData.forEach(city => {
                   
-                  cityMarker=L.marker([city.latitude, city.longitude], {
-                    icon: cityIcon,
-                  }).bindPopup( "<table>" +
+                           
+                cityMarker=L.marker([city.latitude, city.longitude], {
+                  icon: majorCityIcon,
+                }).bindPopup( "<table>" +
                   "<tr>" +
                       "<td colspan='2' id='space' class='text-center'>" + "<b> " + city.name +  " </b>" + "</td>" + 
                   "</tr>" + 
@@ -228,59 +357,33 @@ latlng= new L.LatLng(latitude, longitude)
                 
                 
               }else{console.log("No Significant Cities")}  
-              
-           
-              //add flight markers
 
-        flights.eachLayer(function(layer){
-          flights.removeLayer(layer);
-   })
+
+              // add webcam markers
+              cams.eachLayer(function (layer) {
+                cams.removeLayer(layer);
+              });
+
+
+              if(thisresult.webCams.result.webcams!=null){
+
+                console.log(thisresult.webCams.result.webcams)
+                thisresult.webCams.result.webcams.forEach(cam => {
+                  
+                 
+
+                  camMarker = L.marker([cam.location.latitude, cam.location.longitude], {
+                    icon: camIcon
+                }).bindPopup(`<b><a href="https://api.lookr.com/embed/player/${cam.id}/day"  onclick="window.open('https://api.lookr.com/embed/player/${cam.id}/day','popup','width=600,height=600,scrollbars=no,resizable=no'); return false;"><img src=${cam.image.daylight.thumbnail}></b>`);
+
+                cams.addLayer(camMarker).addTo(myMap); 
+               
+                })
+              
+              }else{console.log("No Significant WebCams")}
+            
 
   
-      
-   if(thisresult.flightData!=null){
-    thisresult.flightData.forEach(flight => {
-      
-      flightMarker=L.marker([flight.live.latitude, flight.live.longitude], {
-        icon: flightIcon,
-      }).bindPopup("<table>" +
-      "<tr>" +
-          "<td colspan='2' id='space'>" + "<div class='text-center' >"+ flight.airline.name +"</div></td>" + 
-      "</tr>" +
-      "<tr>" +
-          "<td colspan='2' id='space' class='text-center'>" + "<b> " + flight.aircraft.registration +  " </b>" + "</td>" + 
-      "</tr>" + 
-     
-      "<tr>" +
-          "<td class='right'> Departure Airport: </td>" + 
-          "<td class='left'>" + flight.departure.airport + "</td>" +
-      "</tr>" + 
-
-      "<tr>" + 
-          "<td class='right'> Departure Time: </td>"  + 
-          "<td class='left'>" + flight.departure.scheduled +
-      "</tr>" + 
-    
-      "<tr>" + 
-          "<td class='right'> Arrival Airport: </td>"  + 
-          "<td class='left'> " + flight.arrival.airport + "</td>" +
-      "</tr>" +
-      "<tr>" +
-          "<td class='right'> Est. Arrival Time: </td>"  + 
-          "<td class='left'>" + flight.arrival.estimated + "</td>" +
-      "</tr>" +
-      
-      
-  "</table>")
-    
-      flights.addLayer(flightMarker).addTo(myMap); 
-
-    });
-    
-    
-  }else{console.log("No Significant Cities")} 
-
-
 
 
           },
@@ -301,6 +404,7 @@ latlng= new L.LatLng(latitude, longitude)
     dataType: "json",
     success: function (result) {
 
+      
       
       $.each(result.data, function (index) {
         $("#selectCountry").append(
@@ -324,9 +428,23 @@ latlng= new L.LatLng(latitude, longitude)
         console.log(error);
       },
     });
+  }
+
+  const errorCallback = (error) => {
+    console.log("Unable to retrieve your location");
+
+    if (!navigator.geolocation) {
+      console.log("Geolocation is not supported by your browser");
+    }
+  };
+
+  navigator.geolocation.getCurrentPosition(successCallback, errorCallback, {
+    enableHighAccuracy: true,
+  });
 
 
-   });
+
+//end of geoloc
 
 })
 
@@ -353,15 +471,16 @@ $("#selectCountry").change(function () {
     success: function (thisresult) {
      
       //if api call is successful fadeout loader and populate data into modals and popups
+      
 
       if(thisresult.status.name=="ok"){
-
+console.log(thisresult)
         
         modalData(thisresult);
         $(".loader_container").fadeOut(2000);
         $(".loader").fadeOut(2000);
 
-      }
+      // }
 
   
 
@@ -374,49 +493,8 @@ $("#selectCountry").change(function () {
            
 
 
-            var genPopup = L.popup({className: 'gen'}).setContent(
-              "<table>" +
-                    "<tr>" +
-                        "<td colspan='2' id='space'>" + "<div class='text-center' ><img class='flags' src=" + flag + "></div></td>" + 
-                    "</tr>" +
-                    "<tr>" +
-                        "<td colspan='2' id='space' class='text-center'>" + "<b> " + thisresult.geoName.countryName +  " (" + thisresult.geoName.iso2 + ")" + " </b>" + "</td>" + 
-                    "</tr>" + 
-                   
-                    "<tr>" +
-                        "<td class='right'> Capital: </td>" + 
-                        "<td class='left'>" + thisresult.geoName.capital + "</td>" +
-                    "</tr>" + 
-    
-                    "<tr>" + 
-                        "<td class='right'> CurrentWeather: </td>"  + 
-                        "<td class='left'>" + thisresult.openWeatherData.feelsLike + " &#8451;" +
-                    "</tr>" + 
-                  
-                    "<tr>" + 
-                        "<td class='right'> TimeZone: </td>"  + 
-                        "<td class='left'> " + thisresult.travelBrief.time_zone + "</td>" +
-                    "</tr>" +
-                    "<tr>" +
-                        "<td class='right'> Currency: </td>"  + 
-                        "<td class='left'>" + thisresult.travelBrief.currency_code + " "+ thisresult.travelBrief.currency_symbol+"</td>" +
-                    "</tr>" +
-                    "<tr>" +
-                        "<td class='right'> Rate to $USD: </td>" + 
-                        "<td class='left'>" + Number(thisresult.travelBrief.rateVSdollar).toLocaleString("en") + "</td>" +
-                    "</tr>" + 
-                    "<tr>" +
-                        "<td class='right'> Drinking Water: </td>" + 
-                        "<td class='left'> +" + thisresult.travelBrief.drinkingWater + "</td>" +
-                    "</tr>" +
-                    
-                "</table>"
-
-
-            ).setLatLng(latlng);  
 
       // Add Major City markers  
-
       cities.eachLayer(function (layer) {
         cities.removeLayer(layer);
       });
@@ -424,9 +502,10 @@ $("#selectCountry").change(function () {
       if(thisresult.cityData!=null){
         thisresult.cityData.forEach(city => {
           
-          cityMarker=L.marker([city.latitude, city.longitude], {
-            icon: cityIcon,
-          }).bindPopup( "<table>" +
+     
+         cityMarker=L.marker([city.latitude, city.longitude], {
+          icon: majorCityIcon,
+        }).bindPopup( "<table>" +
           "<tr>" +
               "<td colspan='2' id='space' class='text-center'>" + "<b> " + city.name +  " </b>" + "</td>" + 
           "</tr>" + 
@@ -451,7 +530,29 @@ $("#selectCountry").change(function () {
         
       }else{console.log("No Significant Cities")}  
       
-   
+    // add webcam markers
+    cams.eachLayer(function (layer) {
+      cams.removeLayer(layer);
+    });
+
+
+    if(thisresult.webCams.result.webcams!=null){
+
+      console.log(thisresult.webCams.result.webcams)
+      thisresult.webCams.result.webcams.forEach(cam => {
+        
+       
+
+        camMarker = L.marker([cam.location.latitude, cam.location.longitude], {
+          icon: camIcon
+      }).bindPopup(`<b><a href="https://api.lookr.com/embed/player/${cam.id}/day"  onclick="window.open('https://api.lookr.com/embed/player/${cam.id}/day','popup','width=600,height=600,scrollbars=no,resizable=no'); return false;"><img src=${cam.image.daylight.thumbnail}></b>`);
+
+      cams.addLayer(camMarker).addTo(myMap); 
+     
+      })
+    
+    }else{console.log("No Significant WebCams")}
+  
 
 
 
@@ -465,14 +566,16 @@ if (myMap.hasLayer(border)) {
 
 border = L.geoJSON(thisresult["border"], {
   style: function (feature) {
-    return { color: "#C850C0" };
+    return { color: "red" };
   },
 }).addTo(myMap);
 
 
-myMap.fitBounds(border.getBounds()).openPopup(genPopup);
+myMap.fitBounds(border.getBounds())
 
 
+
+      }
 
     },
 
@@ -520,7 +623,7 @@ var OpenRailwayMap = L.tileLayer(
   var mapOverlays = {
         "Railway Tracks": OpenRailwayMap,
         "City Checker": cities,
-        "Flight Tracker": flights
+        "Web Cams": cams
  
   };
 
@@ -568,3 +671,19 @@ L.easyButton(
   "Covid Information"
 ).addTo(myMap);
 
+
+L.easyButton(
+  "<i class='far fa-calendar-check'></i>",
+  function () {
+    $("#publicHolidays").modal("toggle");
+  },
+  "Public Holidays"
+).addTo(myMap);
+
+L.easyButton(
+  "<i class='fas fa-newspaper'></i>",
+  function () {
+    $("#latestNews").modal("toggle");
+  },
+  "News"
+).addTo(myMap);
